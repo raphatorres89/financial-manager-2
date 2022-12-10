@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout :: head('Movimentos - Financial Manager')}" />
+
+<body>
+
+<div th:replace="~{navigation :: menu}"></div>
+
+<div class="container">
+
+    <div th:replace="~{layout :: alert}"></div>
+
+    <div class="row">
+        <div class="col">
+            <div class="d-flex justify-content-center pb-2">
+                <ul class="pagination">
+                    <li th:if="${month == 1}" class="page-item">
+                        <a class="page-link" th:href="@{~/movements(month=12, year=${year - 1})}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li th:unless="${month == 1}" class="page-item">
+                        <a class="page-link" th:href="@{~/movements(month=${month - 1}, year=${year})}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link active" href="#" th:text="${month} + '-' + ${year}" />
+                    </li>
+                    <li th:if="${month == 12}" class="page-item">
+                        <a class="page-link" th:href="@{~/movements(month=1, year=${year + 1})}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li th:unless="${month == 12}" class="page-item">
+                        <a class="page-link" th:href="@{~/movements(month=${month + 1}, year=${year})}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <table class="table table-striped table-hover table-responsive-sm table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Nome</th>
+                        <th scope="col" class="text-center">Valor</th>
+                        <th scope="col" class="text-center">Dia</th>
+                        <th scope="col" class="text-center">Parcelas</th>
+                        <th scope="col" class="text-center">Pago</th>
+                        <th scope="col" class="text-center"><i class="bi bi-gear-fill"></i></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="movement : ${movements.content}" th:attr="id=${'movement-' + movement.id}"
+                        th:classappend="${#strings.equals(movement.type, 'PAYMENT') && !movement.isPaid && movement.dueDate.isBefore(actualDate)} ? 'table-danger' : ''">
+                        <td scope="row" class="text-center">
+                            <i th:if="${#strings.equals(movement.type, 'PAYMENT')}" class="bi bi-arrow-down-left-square-fill" style = "color:red;"></i>
+                            <i th:unless="${#strings.equals(movement.type, 'PAYMENT')}" class="bi bi-arrow-up-right-square-fill" style = "color:green;"></i>
+                        </td>
+                        <td scope="row" th:text="${{movement.name}}"></td>
+                        <td scope="row" class="text-center" th:text="${#numbers.formatCurrency(movement.value)}"></td>
+                        <td scope="row" class="text-center" th:text="${#temporals.format(movement.dueDate, 'dd')}"></td>
+                        <td scope="row" class="text-center"
+                            th:text="${movement.installment != null} ? ${movement.installment + '/' + movement.totalInstallment} : ''">
+                        </td>
+                        <td scope="row" class="text-center">
+                            <span th:if="${movement.isPaid}" class="badge text-bg-success">Pago</span>
+                        </td>
+                        <td scope="row" class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <a th:href="@{/movements/{id}/edit(id=${movement.id})}" class="btn btn-outline-dark btn-sm">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button type="button" class="btn btn-outline-danger btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#removeMovement"
+                                    th:attr="data-movement-id=${movement.id}"><i
+                                    class="bi bi-trash3"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a th:href="@{/movements/create}" class="btn btn-primary">Novo Movimento</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="removeMovement">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Excluir Movimento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                Deseja realmente excluir este movimento?
+                <input id="movement-name" readonly class="form-control-plaintext" />
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" action="#" th:method="DELETE">
+                    <button id="deleteMovement" type="submit" class="btn btn-primary">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{layout :: footer}"></div>
+
+<script type="text/javascript">
+        $("#removeMovement").on('show.bs.modal', function (e) {
+            var movementId = $(e.relatedTarget).data('movement-id');
+
+            var cols = $('#movement-' + movementId + ' td');
+            var name = $(cols[0]).text();
+
+            $('#movement-name').val(name);
+
+            $('#deleteForm').attr("action", "/movements/" + movementId);
+        });
+    </script>
+
+</body>
+
+</html>

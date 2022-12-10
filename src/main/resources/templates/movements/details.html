@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout :: head('Movimentos - Financial Manager')}"/>
+
+<body>
+
+<div th:replace="~{navigation :: menu}"></div>
+
+<div class="container">
+
+    <div class="row justify-content-md-center">
+        <div class="col-md-6">
+
+            <div class="card">
+                <div class="card-body">
+
+                    <form class="row g-3"
+                            action="#"
+                            th:action="${#strings.isEmpty(movementDTO?.id)} ? @{/movements} : @{/movements/{id}(id=${movementDTO.id})}"
+                            th:object="${movementDTO}"
+                            th:method="${#strings.isEmpty(movementDTO?.id) ? 'post' : 'put'}">
+
+                        <h5 class="card-title" th:text="${#strings.isEmpty(movementDTO?.id) ? 'Novo movimento' : 'Editar movimento'}"></h5>
+
+                        <input th:field="*{id}" type="hidden" name="id" id="id" />
+
+                        <div class="col-12">
+                            <legend class="col-form-label pt-0">Tipo</legend>
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label" for="movType1">Despesa</label>
+                                <input th:field="*{type}" type="radio" name="type" id="movType1"
+                                       class="form-check-input"
+                                       value="PAYMENT"
+                                       th:checked="${type == 'PAYMENT'}" />
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label" for="movType2">Receita</label>
+                                <input th:field="*{type}" type="radio" name="type" id="movType2"
+                                       class="form-check-input"
+                                       value="RECEIPT"
+                                       th:checked="${type == 'RECEIPT'}" />
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="name" class="form-label">Nome</label>
+                            <input th:field="*{name}" type="text" id="name"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('name')} ? is-invalid : ''"
+                                   placeholder="Cartão de Crédito"
+                                   required />
+                            <div class="invalid-feedback" th:errors="*{name}"></div>
+                        </div>
+
+
+                        <div class="col-6">
+                            <label for="value" class="form-label">Valor</label>
+                            <div class="input-group">
+                                <div class="input-group-text">R$</div>
+                                <input th:field="*{value}" id="value" type="text"
+                                       class="form-control"
+                                       th:classappend="${#fields.hasErrors('value')} ? is-invalid : ''"
+                                       placeholder="0,00"
+                                       required />
+                                <div class="invalid-feedback" th:errors="*{value}"></div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <label for="dueDate" class="form-label">Vencimento</label>
+                            <input th:field="*{dueDate}" type="date" id="dueDate"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('dueDate')} ? is-invalid : ''"
+                                   required />
+                            <div class="invalid-feedback" th:errors="*{dueDate}"></div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="installment" class="form-label">Parcelas</label>
+                            <div class="input-group mb-3">
+                                <input th:field="*{installment}" type="number" id="installment"
+                                       class="form-control"
+                                       th:classappend="${#fields.hasErrors('installment')} ? is-invalid : ''"/>
+                                <span class="input-group-text">de</span>
+                                <input th:field="*{totalInstallment}" type="number" id="totalInstallment"
+                                       class="form-control"
+                                       th:classappend="${#fields.hasErrors('totalInstallment')} ? is-invalid : ''"/>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="isPaid" class="form-label">Pago</label>
+                            <div class="form-check">
+                                <input th:checked="${isPaid}" type="checkbox" id="isPaid"
+                                       class="form-check-input"
+                                       th:classappend="${#fields.hasErrors('isPaid')} ? is-invalid : ''"
+                                       th:field="*{isPaid}" />
+                                <div class="invalid-feedback" th:errors="*{isPaid}"></div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a th:href="@{/movements}" class="btn btn-secondary me-md-2">Voltar</a>
+                            <button type="submit" class="btn btn-primary">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{layout :: footer}"></div>
+
+<script type="text/javascript">
+    let im = new Inputmask({
+      alias: 'currency',
+      radixPoint: ',',
+      groupSeparator: '.',
+      numericInput: true,
+      onBeforeMask: function (value, opts) {
+
+      },
+    })
+
+    let moneyField = document.getElementById('value');
+    im.mask(moneyField)
+
+    $(document).ready(function(){
+      $("#movType1").change(function(){
+        $("#isPaid").toggleClass("d-none");
+        $("#isPaid").prop("checked", false);
+      });
+
+      $("#movType2").change(function(){
+        $("#isPaid").toggleClass("d-none");
+      });
+    });
+
+</script>
+
+</body>
+
+</html>
