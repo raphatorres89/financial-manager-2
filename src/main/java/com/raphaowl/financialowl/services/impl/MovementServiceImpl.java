@@ -60,6 +60,7 @@ public class MovementServiceImpl implements MovementService {
             for (int i = movementDTO.getInstallment() + 1; i <= movementDTO.getTotalInstallment(); i++) {
                 movementDTO.setDueDate(movementDTO.getDueDate().plusMonths(1L));
                 movementDTO.setInstallment(i);
+                log.info("Saving installment {} of {}: {}", i, movementDTO.getTotalInstallment(), movementDTO);
                 movementRepository.save(modelMapper.map(movementDTO, Movement.class));
             }
         }
