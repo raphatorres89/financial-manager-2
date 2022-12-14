@@ -45,47 +45,60 @@
 
     <div class="row">
         <div class="col">
-            <table class="table table-striped table-hover table-responsive-sm table-sm">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col"></th>
-                        <th scope="col">Nome</th>
-                        <th scope="col" class="text-center">Valor</th>
-                        <th scope="col" class="text-center">Dia</th>
-                        <th scope="col" class="text-center">Parcelas</th>
-                        <th scope="col" class="text-center">Pago</th>
-                        <th scope="col" class="text-center"><i class="bi bi-gear-fill"></i></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="movement : ${movements.content}" th:attr="id=${'movement-' + movement.id}"
-                        th:classappend="${#strings.equals(movement.type, 'PAYMENT') && !movement.isPaid && movement.dueDate.isBefore(actualDate)} ? 'table-danger' : ''">
-                        <td scope="row" class="text-center">
-                            <i th:if="${#strings.equals(movement.type, 'PAYMENT')}" class="bi bi-arrow-down-left-square-fill" style = "color:red;"></i>
-                            <i th:unless="${#strings.equals(movement.type, 'PAYMENT')}" class="bi bi-arrow-up-right-square-fill" style = "color:green;"></i>
-                        </td>
-                        <td scope="row" th:text="${{movement.name}}"></td>
-                        <td scope="row" class="text-center" th:text="${#numbers.formatCurrency(movement.value)}"></td>
-                        <td scope="row" class="text-center" th:text="${#temporals.format(movement.dueDate, 'dd')}"></td>
-                        <td scope="row" class="text-center"
-                            th:text="${movement.installment != null} ? ${movement.installment + '/' + movement.totalInstallment} : ''">
-                        </td>
-                        <td scope="row" class="text-center">
-                            <span th:if="${movement.isPaid}" class="badge text-bg-success">Pago</span>
-                        </td>
-                        <td scope="row" class="d-grid gap-2 d-md-flex justify-content-md-center">
-                            <a th:href="@{/movements/{id}/edit(id=${movement.id})}" class="btn btn-outline-dark btn-sm">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button type="button" class="btn btn-outline-danger btn-sm"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#removeMovement"
-                                    th:attr="data-movement-id=${movement.id}"><i
-                                    class="bi bi-trash3"></i></button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive-sm">
+                <table class="table table-striped table-hover table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Nome</th>
+                            <th scope="col" class="text-center">Valor</th>
+                            <th scope="col" class="text-center">Dia</th>
+                            <th scope="col" class="text-center">Parcelas</th>
+                            <th scope="col" class="text-center">Pago</th>
+                            <th scope="col" class="text-center"><i class="bi bi-gear-fill"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="movement : ${movements.content}" th:attr="id=${'movement-' + movement.id}"
+                            th:classappend="${#strings.equals(movement.type, 'PAYMENT') && !movement.isPaid && movement.dueDate.isBefore(actualDate)} ? 'table-danger' : ''">
+
+                            <td scope="row" class="text-center" style="width: 30px;">
+                                <i th:if="${#strings.equals(movement.type, 'PAYMENT')}" class="bi bi-arrow-down-left-square-fill" style = "color:red;"></i>
+                                <i th:unless="${#strings.equals(movement.type, 'PAYMENT')}" class="bi bi-arrow-up-right-square-fill" style = "color:green;"></i>
+                            </td>
+
+                            <td scope="row" th:text="${{movement.name}}"></td>
+
+                            <td scope="row" class="text-end" th:text="${#numbers.formatCurrency(movement.value)}"></td>
+
+                            <td scope="row" class="text-center" th:text="${#temporals.format(movement.dueDate, 'dd')}"></td>
+
+                            <td scope="row" class="text-center"
+                                th:text="${movement.installment != null} ? ${movement.installment + '/' + movement.totalInstallment} : ''">
+                            </td>
+
+                            <td scope="row" class="text-center">
+                                <span th:if="${movement.isPaid}" class="badge text-bg-success">Pago</span>
+                            </td>
+
+                            <td scope="row" class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a th:href="@{/movements/{id}/edit(id=${movement.id})}" class="btn btn-outline-dark btn-sm">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#removeMovement"
+                                        th:attr="data-movement-id=${movement.id}"><i
+                                        class="bi bi-trash3"></i></button>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${movements.empty}">
+                            <td colspan="7">Nenhum movimento encontrado</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
